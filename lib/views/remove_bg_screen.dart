@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:screenshot/screenshot.dart';
+import '../components/choose_image.dart';
 import '../components/primary_button.dart';
+import '../components/snackbar.dart';
 import '../controllers/remove_bg_controller.dart';
 
 class RemoveBackroundScreen extends StatelessWidget {
@@ -40,34 +42,27 @@ class RemoveBackroundScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 40),
-                              ReusablePrimaryButton(
-                                  childText: "Remove Background",
-                                  textColor: Colors.white,
-                                  buttonColor: Colors.deepPurpleAccent,
-                                  onPressed: () async {
-                                    if (controller.imageFile == null) {
-                                      Get.snackbar(
-                                        "Error",
-                                        "Please select an image",
-                                        colorText: Colors.white,
-                                        snackPosition: SnackPosition.TOP,
-                                        backgroundColor: Colors.red,
-                                        borderRadius: 10,
-                                        margin: const EdgeInsets.all(10),
-                                        borderColor: Colors.red,
-                                        borderWidth: 2,
-                                        duration: const Duration(seconds: 2),
-                                        icon: const Icon(Icons.error),
-                                      );
-                                    } else {
-                                      controller.imageFile =
-                                          await RemoveBgController()
-                                              .removeBgApi(
-                                                  controller.imagePath!);
-                                      print("Success");
-                                    }
-                                    controller.update();
-                                  }),
+                              controller.isLoading.value
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : ReusablePrimaryButton(
+                                      childText: "Remove Background",
+                                      textColor: Colors.white,
+                                      buttonColor: Colors.deepPurpleAccent,
+                                      onPressed: () async {
+                                        if (controller.imageFile == null) {
+                                          showSnackBar("Error",
+                                              "Please select an image", true);
+                                        } else {
+                                          controller.imageFile =
+                                              await RemoveBgController()
+                                                  .removeBg(
+                                                      controller.imagePath!);
+                                          print("Success");
+                                        }
+                                        controller.update();
+                                      }),
                               const SizedBox(height: 20),
                               ReusablePrimaryButton(
                                   childText: "Save Image",
@@ -77,33 +72,11 @@ class RemoveBackroundScreen extends StatelessWidget {
                                     if (controller.imageFile != null) {
                                       controller.saveImage();
 
-                                      Get.snackbar(
-                                        "Success",
-                                        "Image saved successfully",
-                                        colorText: Colors.white,
-                                        snackPosition: SnackPosition.TOP,
-                                        backgroundColor: Colors.green,
-                                        borderRadius: 10,
-                                        margin: const EdgeInsets.all(10),
-                                        borderColor: Colors.green,
-                                        borderWidth: 2,
-                                        duration: const Duration(seconds: 2),
-                                        icon: const Icon(Icons.check),
-                                      );
+                                      showSnackBar("Success",
+                                          "Image saved successfully", false);
                                     } else {
-                                      Get.snackbar(
-                                        "Error",
-                                        "Please select an image",
-                                        colorText: Colors.white,
-                                        snackPosition: SnackPosition.TOP,
-                                        backgroundColor: Colors.red,
-                                        borderRadius: 10,
-                                        margin: const EdgeInsets.all(10),
-                                        borderColor: Colors.red,
-                                        borderWidth: 2,
-                                        duration: const Duration(seconds: 2),
-                                        icon: const Icon(Icons.error),
-                                      );
+                                      showSnackBar("Error",
+                                          "Please select an image", true);
                                     }
                                   }),
                               const SizedBox(height: 20),
@@ -151,46 +124,4 @@ class RemoveBackroundScreen extends StatelessWidget {
               }),
         ));
   }
-}
-
-Widget bottomSheet(controller, context) {
-  return Container(
-    height: 100.0,
-    width: double.infinity,
-    margin: const EdgeInsets.symmetric(
-      horizontal: 20,
-      vertical: 20,
-    ),
-    child: Column(
-      children: <Widget>[
-        const Text(
-          "Choose an image",
-          style: TextStyle(
-            fontSize: 20.0,
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children:[
-          FlatButton.icon(
-            icon: const Icon(Icons.camera),
-            onPressed: () {
-              controller.pickImage(ImageSource.camera);
-              Navigator.pop(context);
-            },
-            label: const Text("Camera"),
-          ),
-          FlatButton.icon(
-            icon: const Icon(Icons.image),
-            onPressed: () {
-              controller.pickImage(ImageSource.gallery);
-              Navigator.pop(context);
-            },
-            label: const Text("Gallery"),
-          ),
-        ])
-      ],
-    ),
-  );
 }
