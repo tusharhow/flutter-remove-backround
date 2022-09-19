@@ -21,21 +21,38 @@ Widget bottomSheet(controller, context) {
           height: 20,
         ),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          FlatButton.icon(
-            icon: const Icon(Icons.camera),
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               controller.pickImage(ImageSource.camera);
               Navigator.pop(context);
             },
-            label: const Text("Camera"),
+            child: Row(
+              children: const [
+                Icon(Icons.camera),
+                SizedBox(
+                  width: 5,
+                ),
+                Text("Camera"),
+              ],
+            ),
           ),
-          FlatButton.icon(
-            icon: const Icon(Icons.image),
-            onPressed: () {
+          const SizedBox(
+            width: 20,
+          ),
+          GestureDetector(
+            onTap: () {
               controller.pickImage(ImageSource.gallery);
               Navigator.pop(context);
             },
-            label: const Text("Gallery"),
+            child: Row(
+              children: const [
+                Icon(Icons.image),
+                SizedBox(
+                  width: 5,
+                ),
+                Text("Gallery"),
+              ],
+            ),
           ),
         ])
       ],
